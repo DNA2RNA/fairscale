@@ -75,7 +75,7 @@ class MOELayer(Base):
         # Reshape into S tokens by dropping sequence dimension.
         reshaped_input = input[0].reshape(-1, d_model)
         self.l_aux, combine_weights, dispatch_mask = self.gate(reshaped_input)
-        dispatched_input = torch.einsum("sec,sm->ecm", dispatch_mask.float(), reshaped_input)
+        dispatched_input = torch.einsum("sec,sm->ecm", dispatch_mask.half(), reshaped_input)
         dispatched_input = _AllToAll.apply(self.group, dispatched_input)
         # Re-shape after all-to-all: ecm -> gecm
         dispatched_input = dispatched_input.reshape(self.world_size, self.num_local_experts, -1, d_model)
